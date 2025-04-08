@@ -2,6 +2,8 @@
 
 ![Traefik Proxmox Provider](https://raw.githubusercontent.com/nx211/traefik-proxmox-provider/main/.assets/logo.png)
 
+Forked from [NX211](https://github.com/NX211/traefik-proxmox-provider)
+
 A Traefik provider that automatically configures routing based on Proxmox VE virtual machines and containers.
 
 ## Features
@@ -22,8 +24,8 @@ A Traefik provider that automatically configures routing based on Proxmox VE vir
 experimental:
   plugins:
     traefik-proxmox-provider:
-      moduleName: github.com/NX211/traefik-proxmox-provider
-      version: v0.7.0
+      moduleName: github.com/valueiron/traefik-proxmox-provider
+      version: v1.0.1
 ```
 
 2. Configure the provider in your dynamic configuration:
@@ -35,7 +37,7 @@ providers:
     traefik-proxmox-provider:
       pollInterval: "30s"
       apiEndpoint: "https://proxmox.example.com"
-      apiTokenId: "root@pam!traefik_prod"
+      apiTokenId: "root@pve!traefik_prod"
       apiToken: "your-api-token"
       apiLogging: "info"
       apiValidateSSL: "true"
@@ -220,6 +222,7 @@ traefik.enable=true
 traefik.http.routers.api.rule=Host(`api.example.com`)
 traefik.http.routers.api.middlewares=auth@file,ratelimit@file
 traefik.http.services.api.loadbalancer.server.port=3000
+traefik.http.services.api.loadbalancer.server.ip=192.168.1.10
 ```
 
 Multiple hosts with path-based routing:
