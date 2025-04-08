@@ -2,11 +2,8 @@ name: Build and Release Traefik Proxmox Provider
 
 on:
   push:
-    branches:
-      - main
-  release:
-    types:
-      - created
+    tags:
+      - 'v1.0.0'  # Trigger the release on tag v1.0.0
 
 jobs:
   build:
@@ -25,12 +22,6 @@ jobs:
 
       - name: Build provider
         run: go build -o traefik-proxmox-provider
-
-      - name: Create Git tag
-        run: |
-          TAG_NAME="v1.0.${{ github.run_number }}"
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
 
       - name: Create release and upload binary
         uses: softprops/action-gh-release@v1
