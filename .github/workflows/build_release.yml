@@ -3,8 +3,8 @@ name: Build and Release Traefik Proxmox Provider
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the main branch
-  workflow_dispatch:  # Manually triggerable workflow
+      - main  # Trigger build on main branch
+  workflow_dispatch:  # Allow manual trigger
   release:
     types:
       - created  # Trigger the release job when a tag is created
@@ -26,6 +26,12 @@ jobs:
 
       - name: Build provider
         run: go build -o traefik-proxmox-provider
+
+      - name: Create tag for release
+        run: |
+          TAG_NAME="v1.0.${{ github.run_number }}"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME  # Push the tag to GitHub
 
   release:
     needs: build
