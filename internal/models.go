@@ -51,6 +51,7 @@ type IP struct {
 	Address     string `json:"ip-address,omitempty"`
 	AddressType string `json:"ip-address-type,omitempty"`
 	Prefix      uint64 `json:"prefix,omitempty"`
+	Interface   string `json:"interface,omitempty"`
 }
 
 func NewService(id uint64, name string, config map[string]string) Service {
