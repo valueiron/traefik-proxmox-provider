@@ -200,12 +200,28 @@ func getServiceMap(client *internal.ProxmoxClient, ctx context.Context) (map[str
 	return servicesMap, nil
 }
 
-func getIPsOfService(client *internal.ProxmoxClient, ctx context.Context, nodeName string, vmID uint64) (ips []internal.IP, err error) {
-	interfaces, err := client.GetVMNetworkInterfaces(ctx, nodeName, vmID)
-	if err != nil {
-		return nil, fmt.Errorf("error getting network interfaces: %w", err)
-	}
-	return interfaces.GetIPs(), nil
+func getIPsOfService(client *internal.ProxmoxClient, ctx context.Context, nodeName string, vmID uint64) ([]internal.IP, error) {
+    interfaces, err := client.GetVMNetworkInterfaces(ctx, nodeName, vmID)
+    if err != nil {
+        return nil, fmt.Errorf("error getting network interfaces: %w", err)
+    }
+
+    ips := interfaces.GetIPs()
+    var eth0IPs []internal.IP
+
+    // Filter out loopback IPs and pick eth0 IPs
+    for _, ip := range ips {
+        if ip.Address != "127.0.0.1" && ip.Interface == "eth0" { // Check for non-loopback and eth0 interface
+            eth0IPs = append(eth0IPs, ip)
+        }
+    }
+
+    // Ensure that we have at least two IPs for eth0 and return the second one
+    if len(eth0IPs) >= 2 {
+        return []internal.IP{eth0IPs[1]}, nil  // Return the second IP for eth0
+    }
+
+    return nil, fmt.Errorf("no second IP found for eth0 on service %d", vmID)
 }
 
 func scanServices(client *internal.ProxmoxClient, ctx context.Context, nodeName string) (services []internal.Service, err error) {
