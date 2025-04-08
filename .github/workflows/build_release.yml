@@ -2,12 +2,8 @@ name: Build and Release Traefik Proxmox Provider
 
 on:
   push:
-    branches:
-      - main  # Trigger build on main branch
-  workflow_dispatch:  # Allow manual trigger
-  release:
-    types:
-      - created  # Trigger the release job when a tag is created
+    tags:
+      - 'v*'  # Trigger release on any tag (e.g., v1.0.10)
 
 jobs:
   build:
@@ -27,12 +23,6 @@ jobs:
       - name: Build provider
         run: go build -o traefik-proxmox-provider
 
-      - name: Create tag for release
-        run: |
-          TAG_NAME="v1.0.${{ github.run_number }}"
-          git tag $TAG_NAME
-          git push origin $TAG_NAME  # Push the tag to GitHub
-
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -40,10 +30,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up Git tags
+        run: |
+          echo "GITHUB_REF=${GITHUB_REF}" >> $GITHUB_ENV
+
       - name: Create release and upload binary
         uses: softprops/action-gh-release@v1
         with:
           files: traefik-proxmox-provider
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
